@@ -350,8 +350,8 @@ bool FUnrealMCPCommonUtils::ConnectGraphNodes(UEdGraph* Graph, UEdGraphNode* Sou
         return false;
     }
     
-    UEdGraphPin* SourcePin = FindPin(SourceNode, SourcePinName, EGPD_Output);
-    UEdGraphPin* TargetPin = FindPin(TargetNode, TargetPinName, EGPD_Input);
+    UEdGraphPin* SourcePin = FindPin(SourceNode, SourcePinName);
+    UEdGraphPin* TargetPin = FindPin(TargetNode, TargetPinName);
     
     if (SourcePin && TargetPin)
     {
@@ -362,7 +362,7 @@ bool FUnrealMCPCommonUtils::ConnectGraphNodes(UEdGraph* Graph, UEdGraphNode* Sou
     return false;
 }
 
-UEdGraphPin* FUnrealMCPCommonUtils::FindPin(UEdGraphNode* Node, const FString& PinName, EEdGraphPinDirection Direction)
+UEdGraphPin* FUnrealMCPCommonUtils::FindPin(UEdGraphNode* Node, const FString& PinName)
 {
     if (!Node)
     {
@@ -370,8 +370,8 @@ UEdGraphPin* FUnrealMCPCommonUtils::FindPin(UEdGraphNode* Node, const FString& P
     }
     
     // Log all pins for debugging
-    UE_LOG(LogTemp, Display, TEXT("FindPin: Looking for pin '%s' (Direction: %d) in node '%s'"), 
-           *PinName, (int32)Direction, *Node->GetName());
+    UE_LOG(LogTemp, Display, TEXT("FindPin: Looking for pin '%s' in node '%s'"), 
+           *PinName, *Node->GetName());
     
     for (UEdGraphPin* Pin : Node->Pins)
     {
@@ -382,7 +382,7 @@ UEdGraphPin* FUnrealMCPCommonUtils::FindPin(UEdGraphNode* Node, const FString& P
     // First try exact match
     for (UEdGraphPin* Pin : Node->Pins)
     {
-        if (Pin->PinName.ToString() == PinName && (Direction == EGPD_MAX || Pin->Direction == Direction))
+        if (Pin->PinName.ToString() == PinName)
         {
             UE_LOG(LogTemp, Display, TEXT("  - Found exact matching pin: '%s'"), *Pin->PinName.ToString());
             return Pin;
@@ -392,16 +392,15 @@ UEdGraphPin* FUnrealMCPCommonUtils::FindPin(UEdGraphNode* Node, const FString& P
     // If no exact match and we're looking for a component reference, try case-insensitive match
     for (UEdGraphPin* Pin : Node->Pins)
     {
-        if (Pin->PinName.ToString().Equals(PinName, ESearchCase::IgnoreCase) && 
-            (Direction == EGPD_MAX || Pin->Direction == Direction))
+        if (Pin->PinName.ToString().Equals(PinName, ESearchCase::IgnoreCase))
         {
             UE_LOG(LogTemp, Display, TEXT("  - Found case-insensitive matching pin: '%s'"), *Pin->PinName.ToString());
             return Pin;
         }
     }
     
-    // If we're looking for a component output and didn't find it by name, try to find the first data output pin
-    if (Direction == EGPD_Output && Cast<UK2Node_VariableGet>(Node) != nullptr)
+    // If we didn't find it by name, try to find the first data output pin from variable get nodes
+    if (Cast<UK2Node_VariableGet>(Node) != nullptr)
     {
         for (UEdGraphPin* Pin : Node->Pins)
         {

@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Json.h"
+#include "EdGraph/EdGraphPin.h"
 
 // Forward declarations
 class AActor;
@@ -50,7 +51,7 @@ public:
     static UK2Node_Self* CreateSelfReferenceNode(UEdGraph* Graph, const FVector2D& Position);
     static bool ConnectGraphNodes(UEdGraph* Graph, UEdGraphNode* SourceNode, const FString& SourcePinName, 
                                 UEdGraphNode* TargetNode, const FString& TargetPinName);
-    static UEdGraphPin* FindPin(UEdGraphNode* Node, const FString& PinName, EEdGraphPinDirection Direction = EGPD_MAX);
+    static UEdGraphPin* FindPin(UEdGraphNode* Node, const FString& PinName);
     static UK2Node_Event* FindExistingEventNode(UEdGraph* Graph, const FString& EventName);
 
     // Property utilities
