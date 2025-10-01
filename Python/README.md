@@ -23,6 +23,8 @@ Python bridge for interacting with Unreal Engine 5.5 using the Model Context Pro
 
 At this point, you can configure your MCP Client (Claude Desktop, Cursor, Windsurf) to use the Unreal MCP Server as per the [Configuring your MCP Client](README.md#configuring-your-mcp-client).
 
+**For Cursor users**: Make sure to edit the `mcp.json` file located in the `.cursor` folder within your project directory, not the `mcp.json` file in the project root.
+
 ## Testing Scripts
 
 There are several scripts in the [scripts](./scripts) folder. They are useful for testing the tools and the Unreal Bridge via a direct connection. This means that you do not need to have an MCP Server running.

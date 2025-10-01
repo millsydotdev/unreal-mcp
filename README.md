@@ -140,11 +140,13 @@ Depending on which MCP client you're using, the configuration file location will
 | MCP Client | Configuration File Location | Notes |
 |------------|------------------------------|-------|
 | Claude Desktop | `~/.config/claude-desktop/mcp.json` | On Windows: `%USERPROFILE%\.config\claude-desktop\mcp.json` |
-| Cursor | `.cursor/mcp.json` | Located in your project root directory |
+| Cursor | `.cursor/mcp.json` | **Important**: Edit the `mcp.json` file inside the `.cursor` folder in your project root, not the one in the project root |
 | Windsurf | `~/.config/windsurf/mcp.json` | On Windows: `%USERPROFILE%\.config\windsurf\mcp.json` |
 
 Each client uses the same JSON format as shown in the example above. 
 Simply place the configuration in the appropriate location for your MCP client.
+
+**For Cursor users**: Make sure to edit the `mcp.json` file located in the `.cursor` folder within your project directory, not the `mcp.json` file in the project root.
 
 
 ## License
