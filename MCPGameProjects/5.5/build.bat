@@ -78,11 +78,15 @@ if not exist "%PROJECT_NAME%.sln" (
 
 REM Check if this project has plugins to build
 set HAS_PLUGINS=0
-if exist "Plugins\*.uplugin" (
-    set HAS_PLUGINS=1
-    echo This project contains plugins - building both project and plugins
-    echo.
+if exist "Plugins" (
+    for /r Plugins %%f in (*.uplugin) do (
+        set HAS_PLUGINS=1
+        echo This project contains plugins - building both project and plugins
+        echo.
+        goto :plugins_found
+    )
 )
+:plugins_found
 
 REM Build the project
 if exist "Source" (
