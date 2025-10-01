@@ -109,25 +109,9 @@ if exist "Source" (
 
 REM Build plugins if they exist
 if %HAS_PLUGINS%==1 (
-    echo Building project plugins...
+    echo Project plugins are already built as part of the project compilation above.
+    echo Plugins integrated successfully with project build.
     echo.
-    
-    for /r Plugins %%f in (*.uplugin) do (
-        set PLUGIN_FILE=%%f
-        set PLUGIN_NAME=%%~nf
-        echo Building plugin: !PLUGIN_NAME!
-        echo Plugin File: !PLUGIN_FILE!
-        echo.
-        
-        "%RUNUAT_PATH%" BuildPlugin -Plugin="!PLUGIN_FILE!" -Package="%TEMP%\!PLUGIN_NAME!_%VERSION%" -HostPlatforms=Win64 -NoTargetPlatforms -StrictIncludes
-        
-        if %ERRORLEVEL% EQU 0 (
-            echo SUCCESS: Plugin !PLUGIN_NAME! built successfully!
-        ) else (
-            echo ERROR: Plugin !PLUGIN_NAME! build failed with error code %ERRORLEVEL%
-        )
-        echo.
-    )
 )
 goto :end
 

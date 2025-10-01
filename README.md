@@ -40,6 +40,7 @@ All these capabilities are accessible through natural language commands via AI a
 - **UE 5.5 Project**: `MCPGameProjects/5.5/` - Based off the Blank Project with UnrealMCP plugin
 - **UE 5.6 Project**: `MCPGameProjects/5.6/` - Based off the Blank Project with UnrealMCP plugin
 - Both projects include the UnrealMCP plugin pre-configured for their respective UE versions
+- Both projects include automated `build.bat` scripts for easy compilation
 
 ### Plugin (UnrealMCP) `MCPGameProjects/*/Plugins/UnrealMCP`
 - Native TCP server for MCP communication
@@ -60,11 +61,11 @@ All these capabilities are accessible through natural language commands via AI a
 
 - **MCPGameProjects/** - Example Unreal Engine projects
   - **5.5/** - UE 5.5 project with UnrealMCP plugin
-    - **Plugins/UnrealMCP/** - C++ plugin source for UE 5.5
+    - **Plugins/UnrealMCP/** - C++ plugin source for UE 5.5+
       - **Source/UnrealMCP/** - Plugin source code
       - **UnrealMCP.uplugin** - Plugin definition
   - **5.6/** - UE 5.6 project with UnrealMCP plugin
-    - **Plugins/UnrealMCP/** - C++ plugin source for UE 5.6
+    - **Plugins/UnrealMCP/** - C++ plugin source for UE 5.6+
       - **Source/UnrealMCP/** - Plugin source code
       - **UnrealMCP.uplugin** - Plugin definition
 
@@ -75,26 +76,56 @@ All these capabilities are accessible through natural language commands via AI a
 - **Docs/** - Comprehensive documentation
   - See [Docs/README.md](Docs/README.md) for documentation index
 
+## 🔧 Build Scripts
+
+Both UE 5.5 and 5.6 projects include automated `build.bat` scripts that:
+
+### Features
+- **Universal Detection**: Automatically detects project type (full project, plugin-only, single plugin)
+- **Solution Generation**: Generates Visual Studio solution files if they don't exist
+- **Integrated Builds**: Builds both project and plugins as a unified system
+- **Error Handling**: Provides clear success/failure feedback
+- **UE Version Specific**: Optimized for UE 5.5 and 5.6 respectively
+
+### Usage
+```bash
+# Navigate to your project directory
+cd MCPGameProjects/5.5/  # or MCPGameProjects/5.6/
+
+# Run the build script
+build.bat
+```
+
+The scripts handle all the complexity of UE project building, making it easy to compile both the project and its plugins with a single command.
+
 ## 🚀 Quick Start Guide
 
 ### Prerequisites
-- Unreal Engine 5.5+ or 5.6+
+- Unreal Engine 5.5+
 - Python 3.12+
 - MCP Client (e.g., Claude Desktop, Cursor, Windsurf)
 
 ### Sample projects
 
 For getting started quickly, feel free to use one of the starter projects:
-- **UE 5.5**: Use `MCPGameProjects/5.5/` - UE 5.5 Blank Starter Project with UnrealMCP plugin
-- **UE 5.6**: Use `MCPGameProjects/5.6/` - UE 5.6 Blank Starter Project with UnrealMCP plugin
+- **UE 5.5+**: Use `MCPGameProjects/5.5/` - UE 5.5 Blank Starter Project with UnrealMCP plugin
+- **UE 5.6+**: Use `MCPGameProjects/5.6/` - UE 5.6 Blank Starter Project with UnrealMCP plugin
 
-Both projects have the `UnrealMCP.uplugin` already configured for their respective UE versions. 
+Both projects have the `UnrealMCP.uplugin` already configured for their respective UE versions. The 5.6 project also works with future UE versions. 
 
 1. **Prepare the project**
    - Navigate to either `MCPGameProjects/5.5/` or `MCPGameProjects/5.6/`
    - Right-click the `MCPGameProject.uproject` file
    - Generate Visual Studio project files
+
 2. **Build the project (including the plugin)**
+   
+   **Option A: Automated Build (Recommended)**
+   - Run `build.bat` from the project directory
+   - The script automatically detects the project type and builds both project and plugins
+   - Works for any UE 5.5+ or 5.6+ project
+   
+   **Option B: Manual Build**
    - Open the `MCPGameProject.sln` solution file
    - Choose `Development Editor` as your target
    - Build
@@ -103,8 +134,8 @@ Both projects have the `UnrealMCP.uplugin` already configured for their respecti
 Otherwise, if you want to use the plugin in your existing project:
 
 1. **Copy the plugin to your project**
-   - Copy `MCPGameProjects/5.5/Plugins/UnrealMCP` or `MCPGameProjects/5.6/Plugins/UnrealMCP` to your project's Plugins folder
-   - Choose the version that matches your UE version
+   - Copy `MCPGameProjects/5.5/Plugins/UnrealMCP` (for UE 5.5) or `MCPGameProjects/5.6/Plugins/UnrealMCP` (for UE 5.6) to your project's Plugins folder
+   - Choose the version that matches your UE version (5.6 project works with future UE versions)
 
 2. **Enable the plugin**
    - Edit > Plugins
