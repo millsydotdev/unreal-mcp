@@ -36,14 +36,17 @@ All these capabilities are accessible through natural language commands via AI a
 
 ## 🧩 Components
 
-### Sample Project (MCPGameProject) `MCPGameProject`
-- Based off the Blank Project, but with the UnrealMCP plugin added.
+### Sample Projects (MCPGameProject)
+- **UE 5.5 Project**: `MCPGameProjects/5.5/` - Based off the Blank Project with UnrealMCP plugin
+- **UE 5.6 Project**: `MCPGameProjects/5.6/` - Based off the Blank Project with UnrealMCP plugin
+- Both projects include the UnrealMCP plugin pre-configured for their respective UE versions
 
-### Plugin (UnrealMCP) `MCPGameProject/Plugins/UnrealMCP`
+### Plugin (UnrealMCP) `MCPGameProjects/*/Plugins/UnrealMCP`
 - Native TCP server for MCP communication
 - Integrates with Unreal Editor subsystems
 - Implements actor manipulation tools
 - Handles command execution and response handling
+- Available for both UE 5.5 and UE 5.6
 
 ### Python MCP Server `Python/unreal_mcp_server.py`
 - Implemented in `unreal_mcp_server.py`
@@ -55,10 +58,15 @@ All these capabilities are accessible through natural language commands via AI a
 
 ## 📂 Directory Structure
 
-- **MCPGameProject/** - Example Unreal project
-  - **Plugins/UnrealMCP/** - C++ plugin source
-    - **Source/UnrealMCP/** - Plugin source code
-    - **UnrealMCP.uplugin** - Plugin definition
+- **MCPGameProjects/** - Example Unreal Engine projects
+  - **5.5/** - UE 5.5 project with UnrealMCP plugin
+    - **Plugins/UnrealMCP/** - C++ plugin source for UE 5.5
+      - **Source/UnrealMCP/** - Plugin source code
+      - **UnrealMCP.uplugin** - Plugin definition
+  - **5.6/** - UE 5.6 project with UnrealMCP plugin
+    - **Plugins/UnrealMCP/** - C++ plugin source for UE 5.6
+      - **Source/UnrealMCP/** - Plugin source code
+      - **UnrealMCP.uplugin** - Plugin definition
 
 - **Python/** - Python server and tools
   - **tools/** - Tool modules for actor, editor, and blueprint operations
@@ -70,27 +78,33 @@ All these capabilities are accessible through natural language commands via AI a
 ## 🚀 Quick Start Guide
 
 ### Prerequisites
-- Unreal Engine 5.5+
+- Unreal Engine 5.5+ or 5.6+
 - Python 3.12+
 - MCP Client (e.g., Claude Desktop, Cursor, Windsurf)
 
-### Sample project
+### Sample projects
 
-For getting started quickly, feel free to use the starter project in `MCPGameProject`. This is a UE 5.5 Blank Starter Project with the `UnrealMCP.uplugin` already configured. 
+For getting started quickly, feel free to use one of the starter projects:
+- **UE 5.5**: Use `MCPGameProjects/5.5/` - UE 5.5 Blank Starter Project with UnrealMCP plugin
+- **UE 5.6**: Use `MCPGameProjects/5.6/` - UE 5.6 Blank Starter Project with UnrealMCP plugin
+
+Both projects have the `UnrealMCP.uplugin` already configured for their respective UE versions. 
 
 1. **Prepare the project**
-   - Right-click your .uproject file
+   - Navigate to either `MCPGameProjects/5.5/` or `MCPGameProjects/5.6/`
+   - Right-click the `MCPGameProject.uproject` file
    - Generate Visual Studio project files
 2. **Build the project (including the plugin)**
-   - Open solution (`.sln`)
-   - Choose `Development Editor` as your target.
+   - Open the `MCPGameProject.sln` solution file
+   - Choose `Development Editor` as your target
    - Build
 
 ### Plugin
 Otherwise, if you want to use the plugin in your existing project:
 
 1. **Copy the plugin to your project**
-   - Copy `MCPGameProject/Plugins/UnrealMCP` to your project's Plugins folder
+   - Copy `MCPGameProjects/5.5/Plugins/UnrealMCP` or `MCPGameProjects/5.6/Plugins/UnrealMCP` to your project's Plugins folder
+   - Choose the version that matches your UE version
 
 2. **Enable the plugin**
    - Edit > Plugins
