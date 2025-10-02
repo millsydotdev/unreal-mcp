@@ -57,6 +57,7 @@
 #include "Commands/UnrealMCPProjectCommands.h"
 #include "Commands/UnrealMCPCommonUtils.h"
 #include "Commands/UnrealMCPUMGCommands.h"
+#include "Commands/UnrealMCPEnhancedInputCommands.h"
 
 // Default settings
 #define MCP_SERVER_HOST "127.0.0.1"
@@ -69,6 +70,7 @@ UUnrealMCPBridge::UUnrealMCPBridge()
     BlueprintNodeCommands = MakeShared<FUnrealMCPBlueprintNodeCommands>();
     ProjectCommands = MakeShared<FUnrealMCPProjectCommands>();
     UMGCommands = MakeShared<FUnrealMCPUMGCommands>();
+    EnhancedInputCommands = MakeShared<FUnrealMCPEnhancedInputCommands>();
 }
 
 UUnrealMCPBridge::~UUnrealMCPBridge()
@@ -78,6 +80,7 @@ UUnrealMCPBridge::~UUnrealMCPBridge()
     BlueprintNodeCommands.Reset();
     ProjectCommands.Reset();
     UMGCommands.Reset();
+    EnhancedInputCommands.Reset();
 }
 
 // Initialize subsystem
@@ -267,6 +270,26 @@ FString UUnrealMCPBridge::ExecuteCommand(const FString& CommandType, const TShar
             else if (CommandType == TEXT("create_input_mapping"))
             {
                 ResultJson = ProjectCommands->HandleCommand(CommandType, Params);
+            }
+            // Enhanced Input Commands
+            else if (CommandType == TEXT("create_enhanced_input_action_mapping") ||
+                     CommandType == TEXT("create_input_axis_mapping") ||
+                     CommandType == TEXT("add_alternative_key_binding") ||
+                     CommandType == TEXT("list_input_actions") ||
+                     CommandType == TEXT("update_input_action_mapping") ||
+                     CommandType == TEXT("remove_input_action_mapping") ||
+                     CommandType == TEXT("create_input_preset") ||
+                     CommandType == TEXT("apply_input_preset") ||
+                     CommandType == TEXT("create_enhanced_input_action_blueprint_node") ||
+                     CommandType == TEXT("create_input_axis_blueprint_node") ||
+                     CommandType == TEXT("validate_input_mappings") ||
+                     CommandType == TEXT("test_input_action") ||
+                     CommandType == TEXT("export_input_mappings") ||
+                     CommandType == TEXT("import_input_mappings") ||
+                     CommandType == TEXT("create_input_context") ||
+                     CommandType == TEXT("create_input_trigger"))
+            {
+                ResultJson = EnhancedInputCommands->HandleCommand(CommandType, Params);
             }
             // UMG Commands
             else if (CommandType == TEXT("create_umg_widget_blueprint") ||

@@ -39,4 +39,13 @@ You should make sure you have installed dependencies and/or are running in the `
 
 ## Development
 
-To add new tools, modify the `UnrealMCPBridge.py` file to add new command handlers, and update the `unreal_mcp_server.py` file to expose them through the HTTP API. 
+To add new tools, modify the tool files in the `tools/` directory to add new command handlers, and update the `unreal_mcp_server.py` file to expose them through the MCP API.
+
+## Dependencies
+
+This project uses the following key dependencies:
+- **MCP**: Model Context Protocol (v1.15.0+)
+- **FastMCP**: Fast MCP server implementation (v2.12.4+)
+- **FastAPI**: Web framework for the API (v0.118.0+)
+- **Pydantic**: Data validation (v2.11.9+)
+- **Uvicorn**: ASGI server (v0.37.0+) 

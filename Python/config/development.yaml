@@ -1,0 +1,94 @@
+# Development Configuration Template
+# This template is optimized for development environments
+
+version: "0.2.0"
+environment: "development"
+
+# Connection settings for Unreal Engine (Development)
+connection:
+  host: "127.0.0.1"
+  port: 55557
+  timeout: 5                 # Quick timeout for development
+  buffer_size: 65536         # Standard buffer size
+  auto_reconnect: true
+  max_retries: 3
+  retry_delay: 1.0
+
+# Logging configuration (Development)
+logging:
+  level: "DEBUG"             # Verbose logging for development
+  format: "%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s"
+  file_enabled: true
+  file_path: "unreal_mcp_dev.log"
+  file_max_size: 10485760    # 10MB log files
+  file_backup_count: 5
+  console_enabled: true      # Console logging for development
+  console_level: "INFO"      # Info level for console
+
+# Project settings (Development)
+project:
+  project_name: ""
+  engine_version: "5.6"
+  project_path: ""
+  content_path: "/Game"
+  plugins_enabled: []        # Enable all necessary plugins for development
+  plugins_disabled: []       # Keep all plugins enabled for development
+  build_configuration: "Development"  # Development configuration
+  target_platform: "Windows"
+
+# Security settings (Development)
+security:
+  allowed_hosts:
+    - "127.0.0.1"
+    - "localhost"
+    - "192.168.1.0/24"      # Allow local network access for development
+  max_connections: 20        # More connections for development
+  enable_ssl: false          # No SSL in development
+  ssl_cert_path: null
+  ssl_key_path: null
+  api_key_required: false    # No API key required in development
+  api_key: null
+
+# Tool-specific configurations (Development)
+tools:
+  editor_tools:
+    enabled: true
+    timeout: 30
+    retry_count: 2
+    custom_settings: {}
+
+  blueprint_tools:
+    enabled: true
+    timeout: 60
+    retry_count: 2
+    custom_settings:
+      max_blueprint_size: 1048576
+      auto_compile: true           # Auto-compile for development
+      debug_mode: true            # Enable debug mode
+
+  umg_tools:
+    enabled: true
+    timeout: 45
+    retry_count: 2
+    custom_settings:
+      default_widget_path: "/Game/UI"
+      auto_save: true             # Auto-save for development
+      debug_mode: true           # Enable debug mode
+
+  project_tools:
+    enabled: true
+    timeout: 30
+    retry_count: 2
+    custom_settings: {}
+
+  node_tools:
+    enabled: true
+    timeout: 45
+    retry_count: 2
+    custom_settings:
+      debug_mode: true           # Enable debug mode
+
+# Global settings (Development)
+debug_mode: true             # Enable debug mode
+hot_reload: true             # Enable hot reload for development
+config_watch_interval: 0.5   # Check frequently for changes

@@ -1,0 +1,95 @@
+# Unreal MCP Server Configuration
+# This is the default configuration file for the Unreal MCP server.
+
+version: "0.2.0"
+environment: "development"
+
+# Connection settings for Unreal Engine
+connection:
+  host: "127.0.0.1"          # Unreal Engine host address (always localhost)
+  port: 55557                # Default UnrealMCP plugin port
+  timeout: 5                 # Connection timeout in seconds
+  buffer_size: 65536         # Socket buffer size
+  auto_reconnect: true       # Enable automatic reconnection
+  max_retries: 3             # Maximum connection retry attempts
+  retry_delay: 1.0           # Delay between retry attempts in seconds
+
+# Logging configuration
+logging:
+  level: "INFO"              # Default log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+  format: "%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s"
+  file_enabled: true         # Enable file logging
+  file_path: "unreal_mcp.log" # Log file path
+  file_max_size: 10485760    # Maximum log file size in bytes (10MB)
+  file_backup_count: 5       # Number of backup log files
+  console_enabled: false     # Enable console logging
+  console_level: "WARNING"   # Console log level
+
+# Project settings
+project:
+  project_name: ""           # Unreal project name (auto-detected if empty)
+  engine_version: "5.6"      # Unreal Engine version
+  project_path: ""           # Path to .uproject file (auto-detected if empty)
+  content_path: "/Game"      # Content browser root path
+  plugins_enabled: []        # List of enabled plugins
+  plugins_disabled: []       # List of disabled plugins
+  build_configuration: "Development" # Build configuration
+  target_platform: "Windows" # Target platform
+
+# Security settings
+security:
+  allowed_hosts:             # Allowed connection hosts
+    - "127.0.0.1"
+    - "localhost"
+  max_connections: 10        # Maximum concurrent connections
+  enable_ssl: false          # Enable SSL/TLS encryption
+  ssl_cert_path: null        # Path to SSL certificate
+  ssl_key_path: null         # Path to SSL private key
+  api_key_required: false    # Require API key for authentication
+  api_key: null              # API key for authentication
+
+# Tool-specific configurations
+tools:
+  # Editor tools configuration
+  editor_tools:
+    enabled: true
+    timeout: 30
+    retry_count: 2
+    custom_settings: {}
+
+  # Blueprint tools configuration
+  blueprint_tools:
+    enabled: true
+    timeout: 60
+    retry_count: 2
+    custom_settings:
+      max_blueprint_size: 1048576  # Maximum blueprint size in bytes
+      auto_compile: true           # Auto-compile blueprints after changes
+
+  # UMG tools configuration
+  umg_tools:
+    enabled: true
+    timeout: 45
+    retry_count: 2
+    custom_settings:
+      default_widget_path: "/Game/UI"  # Default path for new widgets
+      auto_save: true                  # Auto-save widget changes
+
+  # Project tools configuration
+  project_tools:
+    enabled: true
+    timeout: 30
+    retry_count: 2
+    custom_settings: {}
+
+  # Node tools configuration
+  node_tools:
+    enabled: true
+    timeout: 45
+    retry_count: 2
+    custom_settings: {}
+
+# Global settings
+debug_mode: false           # Enable debug mode
+hot_reload: true           # Enable configuration hot-reloading
+config_watch_interval: 1.0 # Configuration file watch interval in seconds

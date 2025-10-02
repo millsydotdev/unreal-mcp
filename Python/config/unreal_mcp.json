@@ -1,0 +1,83 @@
+{
+  "version": "0.2.0",
+  "environment": "development",
+  "connection": {
+    "host": "127.0.0.1",
+    "port": 55557,
+    "timeout": 5,
+    "buffer_size": 65536,
+    "auto_reconnect": true,
+    "max_retries": 3,
+    "retry_delay": 1.0
+  },
+  "logging": {
+    "level": "INFO",
+    "format": "%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s",
+    "file_enabled": true,
+    "file_path": "unreal_mcp.log",
+    "file_max_size": 10485760,
+    "file_backup_count": 5,
+    "console_enabled": false,
+    "console_level": "WARNING"
+  },
+  "project": {
+    "project_name": "",
+    "engine_version": "5.6",
+    "project_path": "",
+    "content_path": "/Game",
+    "plugins_enabled": [],
+    "plugins_disabled": [],
+    "build_configuration": "Development",
+    "target_platform": "Windows"
+  },
+  "security": {
+    "allowed_hosts": ["127.0.0.1", "localhost"],
+    "max_connections": 10,
+    "enable_ssl": false,
+    "ssl_cert_path": null,
+    "ssl_key_path": null,
+    "api_key_required": false,
+    "api_key": null
+  },
+  "tools": {
+    "editor_tools": {
+      "enabled": true,
+      "timeout": 30,
+      "retry_count": 2,
+      "custom_settings": {}
+    },
+    "blueprint_tools": {
+      "enabled": true,
+      "timeout": 60,
+      "retry_count": 2,
+      "custom_settings": {
+        "max_blueprint_size": 1048576,
+        "auto_compile": true
+      }
+    },
+    "umg_tools": {
+      "enabled": true,
+      "timeout": 45,
+      "retry_count": 2,
+      "custom_settings": {
+        "default_widget_path": "/Game/UI",
+        "auto_save": true
+      }
+    },
+    "project_tools": {
+      "enabled": true,
+      "timeout": 30,
+      "retry_count": 2,
+      "custom_settings": {}
+    },
+    "node_tools": {
+      "enabled": true,
+      "timeout": 45,
+      "retry_count": 2,
+      "custom_settings": {}
+    }
+  },
+  "debug_mode": false,
+  "hot_reload": true,
+  "config_watch_interval": 1.0
+}

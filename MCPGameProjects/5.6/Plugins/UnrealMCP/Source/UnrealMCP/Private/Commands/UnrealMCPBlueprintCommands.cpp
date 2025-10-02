@@ -66,6 +66,14 @@ TSharedPtr<FJsonObject> FUnrealMCPBlueprintCommands::HandleCommand(const FString
     {
         return HandleSetPawnProperties(Params);
     }
+    // Note: These functions are not implemented yet
+    // else if (CommandType == TEXT("delete_blueprint_node"))
+    // else if (CommandType == TEXT("clear_blueprint_graph"))
+    // else if (CommandType == TEXT("get_blueprint_compilation_errors"))
+    // else if (CommandType == TEXT("get_blueprint_info"))
+    // else if (CommandType == TEXT("get_blueprint_variables"))
+    // else if (CommandType == TEXT("get_blueprint_functions"))
+    // else if (CommandType == TEXT("get_blueprint_components"))
     
     return FUnrealMCPCommonUtils::CreateErrorResponse(FString::Printf(TEXT("Unknown blueprint command: %s"), *CommandType));
 }

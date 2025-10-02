@@ -1,0 +1,90 @@
+# Production Configuration Template
+# This template is optimized for production environments
+
+version: "0.2.0"
+environment: "production"
+
+# Connection settings for Unreal Engine (Production)
+connection:
+  host: "127.0.0.1"
+  port: 55557
+  timeout: 10                # Longer timeout for production stability
+  buffer_size: 131072        # Larger buffer for production workloads
+  auto_reconnect: true
+  max_retries: 5             # More retries for production
+  retry_delay: 2.0           # Longer delay between retries
+
+# Logging configuration (Production)
+logging:
+  level: "WARNING"           # Less verbose logging in production
+  format: "%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s"
+  file_enabled: true
+  file_path: "unreal_mcp_prod.log"
+  file_max_size: 52428800    # 50MB log files in production
+  file_backup_count: 10      # More backup files
+  console_enabled: false     # No console logging in production
+  console_level: "ERROR"     # Only errors to console
+
+# Project settings (Production)
+project:
+  project_name: ""
+  engine_version: "5.6"
+  project_path: ""
+  content_path: "/Game"
+  plugins_enabled: []        # Only enable necessary plugins in production
+  plugins_disabled: []       # Disable development plugins
+  build_configuration: "Shipping"  # Use shipping configuration
+  target_platform: "Windows"
+
+# Security settings (Production)
+security:
+  allowed_hosts:
+    - "127.0.0.1"
+    - "localhost"
+  max_connections: 5         # Fewer connections in production
+  enable_ssl: true           # Enable SSL in production
+  ssl_cert_path: "/path/to/cert.pem"  # Update with actual paths
+  ssl_key_path: "/path/to/key.pem"    # Update with actual paths
+  api_key_required: true     # Require API key in production
+  api_key: "your-secure-api-key-here"  # Update with actual key
+
+# Tool-specific configurations (Production)
+tools:
+  editor_tools:
+    enabled: true
+    timeout: 60              # Longer timeouts for production
+    retry_count: 3
+    custom_settings: {}
+
+  blueprint_tools:
+    enabled: true
+    timeout: 120
+    retry_count: 3
+    custom_settings:
+      max_blueprint_size: 2097152  # Larger blueprints allowed
+      auto_compile: false          # Manual compilation in production
+
+  umg_tools:
+    enabled: true
+    timeout: 90
+    retry_count: 3
+    custom_settings:
+      default_widget_path: "/Game/UI"
+      auto_save: false            # Manual saves in production
+
+  project_tools:
+    enabled: true
+    timeout: 60
+    retry_count: 3
+    custom_settings: {}
+
+  node_tools:
+    enabled: true
+    timeout: 90
+    retry_count: 3
+    custom_settings: {}
+
+# Global settings (Production)
+debug_mode: false
+hot_reload: false            # Disable hot reload in production
+config_watch_interval: 5.0   # Check less frequently

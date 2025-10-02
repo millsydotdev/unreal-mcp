@@ -7,7 +7,7 @@
 	"Category": "Editor",
 	"CreatedBy": "Your Name",
 	"CreatedByURL": "",
-	"DocsURL": "",
+	"DocsURL": "https://github.com/chongdashu/unreal-mcp/tree/main/Docs",
 	"MarketplaceURL": "",
 	"SupportURL": "",
 	"CanContainContent": true,
@@ -31,5 +31,6 @@
 			"Name": "EditorScriptingUtilities",
 			"Enabled": true
 		}
-	]
-} 
+	],
+	"Icon": "Resources/Icon128.png"
+}

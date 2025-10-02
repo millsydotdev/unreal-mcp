@@ -1,7 +1,35 @@
 """
 Unreal Engine MCP Server
 
-A simple MCP server for interacting with Unreal Engine.
+Advanced Model Context Protocol server for comprehensive Unreal Engine 5.6 integration.
+Provides complete UMG widget system, Blueprint management, actor manipulation, and 
+enhanced UI building capabilities with persistent style sets and complex property support.
+
+Features:
+- Socket-based TCP communication on localhost:55557
+- Hierarchical UI construction with JSON definitions
+- Style set system for consistent theming
+- Data binding and MVVM pattern support
+- Widget animation and event handling
+- Blueprint graph introspection and node management
+- Actor spawning and property manipulation
+- Enhanced Blueprint node property system with pin value support
+- Comprehensive configuration management system
+
+Architecture:
+- FastMCP framework with async context management
+- Connection-per-command pattern (Unreal closes after each operation)
+- Comprehensive error handling and logging
+- Modular tool registration system
+- Configuration-driven behavior with validation
+
+Usage:
+1. Ensure Unreal Engine 5.6 is running with UnrealMCP plugin loaded
+2. Start this server via stdio transport
+3. Use MCP client to interact with registered tools
+4. All responses include 'success' field for error checking
+
+For complete tool documentation, use the info() prompt.
 """
 
 import logging
@@ -12,20 +40,87 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator, Dict, Any, Optional
 from mcp.server.fastmcp import FastMCP
 
-# Configure logging with more detailed format
-logging.basicConfig(
-    level=logging.DEBUG,  # Change to DEBUG level for more details
-    format='%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s',
-    handlers=[
-        logging.FileHandler('unreal_mcp.log'),
-        # logging.StreamHandler(sys.stdout) # Remove this handler to unexpected non-whitespace characters in JSON
-    ]
-)
+# Initialize logger first (will be reconfigured after config load)
 logger = logging.getLogger("UnrealMCP")
 
-# Configuration
-UNREAL_HOST = "127.0.0.1"
-UNREAL_PORT = 55557
+# Default configuration values (used if no config file is found)
+DEFAULT_UNREAL_HOST = "127.0.0.1"  # Always localhost - Unreal plugin listens locally only
+DEFAULT_UNREAL_PORT = 55557        # Default UnrealMCP plugin port - must match plugin settings
+
+# Global configuration state
+_config = None
+
+def load_configuration():
+    """Load configuration from file or use defaults."""
+    global _config
+    
+    try:
+        from tools.config_manager import get_config_manager
+        config_manager = get_config_manager()
+        _config = config_manager.load_config()
+        
+        # Reconfigure logging based on loaded config
+        logging_config = _config.logging
+        
+        # Clear existing handlers
+        for handler in logger.handlers[:]:
+            logger.removeHandler(handler)
+        
+        # Configure logging level
+        log_level = getattr(logging, logging_config.level.value)
+        logger.setLevel(log_level)
+        
+        # Create formatter
+        formatter = logging.Formatter(logging_config.format)
+        
+        # Add file handler if enabled
+        if logging_config.file_enabled:
+            from logging.handlers import RotatingFileHandler
+            file_handler = RotatingFileHandler(
+                logging_config.file_path,
+                maxBytes=logging_config.file_max_size,
+                backupCount=logging_config.file_backup_count
+            )
+            file_handler.setFormatter(formatter)
+            logger.addHandler(file_handler)
+        
+        # Add console handler if enabled
+        if logging_config.console_enabled:
+            console_handler = logging.StreamHandler(sys.stdout)
+            console_handler.setLevel(getattr(logging, logging_config.console_level.value))
+            console_handler.setFormatter(formatter)
+            logger.addHandler(console_handler)
+        
+        logger.info(f"Configuration loaded successfully from: {config_manager._config_file_path}")
+        logger.info(f"Environment: {_config.environment}, Debug mode: {_config.debug_mode}")
+        
+        return _config
+        
+    except Exception as e:
+        logger.error(f"Failed to load configuration: {e}")
+        logger.info("Using default configuration")
+        
+        # Use default configuration
+        from tools.config_manager import UnrealMCPConfig
+        _config = UnrealMCPConfig()
+        
+        # Configure basic logging
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s',
+            handlers=[
+                logging.FileHandler('unreal_mcp.log'),
+            ]
+        )
+        
+        return _config
+
+def get_config():
+    """Get the current configuration."""
+    global _config
+    if _config is None:
+        _config = load_configuration()
+    return _config
 
 class UnrealConnection:
     """Connection to an Unreal Engine instance."""
@@ -46,19 +141,23 @@ class UnrealConnection:
                     pass
                 self.socket = None
             
-            logger.info(f"Connecting to Unreal at {UNREAL_HOST}:{UNREAL_PORT}...")
+            # Get configuration
+            config = get_config()
+            connection_config = config.connection
+            
+            logger.info(f"Connecting to Unreal at {connection_config.host}:{connection_config.port}...")
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.socket.settimeout(5)  # 5 second timeout
+            self.socket.settimeout(connection_config.timeout)
             
             # Set socket options for better stability
             self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
             self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
             
-            # Set larger buffer sizes
-            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 65536)
-            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 65536)
+            # Set buffer sizes from configuration
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, connection_config.buffer_size)
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, connection_config.buffer_size)
             
-            self.socket.connect((UNREAL_HOST, UNREAL_PORT))
+            self.socket.connect((connection_config.host, connection_config.port))
             self.connected = True
             logger.info("Connected to Unreal Engine")
             return True
@@ -239,7 +338,17 @@ def get_unreal_connection() -> Optional[UnrealConnection]:
 async def server_lifespan(server: FastMCP) -> AsyncIterator[Dict[str, Any]]:
     """Handle server startup and shutdown."""
     global _unreal_connection
+    
+    # Load configuration first
     logger.info("UnrealMCP server starting up")
+    try:
+        config = load_configuration()
+        logger.info(f"Configuration loaded: {config.environment} environment, debug={config.debug_mode}")
+    except Exception as e:
+        logger.error(f"Error loading configuration: {e}")
+        config = None
+    
+    # Initialize Unreal connection
     try:
         _unreal_connection = get_unreal_connection()
         if _unreal_connection:
@@ -260,8 +369,8 @@ async def server_lifespan(server: FastMCP) -> AsyncIterator[Dict[str, Any]]:
 
 # Initialize server
 mcp = FastMCP(
-    "UnrealMCP",
-    description="Unreal Engine integration via Model Context Protocol",
+    name="UnrealMCP",
+    instructions="Unreal Engine integration via Model Context Protocol",
     lifespan=server_lifespan
 )
 
@@ -271,13 +380,31 @@ from tools.blueprint_tools import register_blueprint_tools
 from tools.node_tools import register_blueprint_node_tools
 from tools.project_tools import register_project_tools
 from tools.umg_tools import register_umg_tools
+from tools.animation_blueprint_tools import register_animation_blueprint_tools
+from tools.material_tools import register_material_tools
+from tools.enhanced_input_tools import register_enhanced_input_tools
+from tools.umg_reflection import register_umg_reflection_tools
+from tools.asset_discovery import register_asset_discovery_tools
+from tools.umg_events import register_umg_event_tools
+from tools.system_diagnostics import register_system_diagnostic_tools
+from tools.umg_styling import register_umg_styling_tools
+from tools.umg_discovery import register_umg_discovery_tools
 
 # Register tools
 register_editor_tools(mcp)
 register_blueprint_tools(mcp)
 register_blueprint_node_tools(mcp)
 register_project_tools(mcp)
-register_umg_tools(mcp)  
+register_umg_tools(mcp)
+register_animation_blueprint_tools(mcp)
+register_material_tools(mcp)
+register_enhanced_input_tools(mcp)
+register_umg_reflection_tools(mcp)
+register_asset_discovery_tools(mcp)
+register_umg_event_tools(mcp)
+register_system_diagnostic_tools(mcp)
+register_umg_styling_tools(mcp)
+register_umg_discovery_tools(mcp)  
 
 @mcp.prompt()
 def info():
@@ -322,6 +449,31 @@ def info():
     - `set_pawn_properties(blueprint_name)` - Configure Pawn settings
     - `spawn_blueprint_actor(blueprint_name, actor_name)` - Spawn Blueprint actors
     
+    ## Animation Blueprint Management
+    - `create_animation_blueprint(name, parent_class="AnimInstance", target_skeleton="", path="/Game/Animations")` - Create Animation Blueprint
+    - `create_animation_blueprint_with_skeleton(name, skeleton_path, parent_class="AnimInstance", path="/Game/Animations")` - Create with skeleton
+    - `set_animation_blueprint_target_skeleton(blueprint_name, skeleton_path)` - Set target skeleton
+    - `get_animation_blueprint_info(blueprint_name)` - Get comprehensive animation blueprint info
+    - `create_animation_state_machine(blueprint_name, state_machine_name, graph_name="AnimGraph")` - Create state machine
+    - `add_animation_state(blueprint_name, state_machine_name, state_name, animation_sequence="", state_type="AnimationState")` - Add animation state
+    - `connect_animation_states(blueprint_name, state_machine_name, from_state, to_state, transition_rule="Always")` - Connect states
+    - `set_animation_state_machine_entry_state(blueprint_name, state_machine_name, entry_state)` - Set entry state
+    - `create_animation_blend_space(blueprint_name, blend_space_name, blend_space_type="1D", skeleton_path="")` - Create blend space
+    - `add_animation_to_blend_space(blueprint_name, blend_space_name, animation_sequence, blend_position=[0.0, 0.0])` - Add animation to blend space
+    - `create_animation_blend_node(blueprint_name, node_name, blend_type="BlendPoses", input_count=2)` - Create blend node
+    - `add_animation_sequence_node(blueprint_name, node_name, animation_sequence, graph_name="AnimGraph")` - Add sequence node
+    - `add_animation_output_node(blueprint_name, node_name="OutputPose", graph_name="AnimGraph")` - Add output node
+    - `connect_animation_nodes(blueprint_name, source_node, target_node, source_pin="Pose", target_pin="Pose", graph_name="AnimGraph")` - Connect animation nodes
+    - `add_animation_blueprint_variable(blueprint_name, variable_name, variable_type="Float", default_value=None, is_exposed=False)` - Add variable
+    - `get_animation_blueprint_variables(blueprint_name)` - Get all variables
+    - `add_animation_montage_node(blueprint_name, node_name, montage_asset, graph_name="AnimGraph")` - Add montage node
+    - `create_animation_montage(montage_name, skeleton_path, animation_sequence="", path="/Game/Animations")` - Create montage asset
+    - `compile_animation_blueprint(blueprint_name)` - Compile animation blueprint
+    - `validate_animation_blueprint(blueprint_name)` - Validate animation blueprint
+    - `get_animation_blueprint_compilation_errors(blueprint_name)` - Get compilation errors
+    - `get_available_animation_blueprint_types()` - Get available types and capabilities
+    - `create_complete_animation_blueprint(name, skeleton_path, include_state_machine=True, include_blend_space=True, include_basic_animations=True, path="/Game/Animations")` - Create complete setup
+    
     ## Blueprint Node Management
     - `add_blueprint_event_node(blueprint_name, event_type)` - Add event nodes
     - `add_blueprint_input_action_node(blueprint_name, action_name)` - Add input nodes
@@ -334,6 +486,28 @@ def info():
     
     ## Project Tools
     - `create_input_mapping(action_name, key, input_type)` - Create input mappings
+    - `get_project_info()` - Get comprehensive project information
+    - `get_engine_settings()` - Get current engine settings
+    - `set_engine_setting(setting_name, setting_value, section)` - Set engine configuration
+    - `get_plugin_info(plugin_name)` - Get plugin information (all or specific)
+    - `enable_plugin(plugin_name)` - Enable a plugin
+    - `disable_plugin(plugin_name)` - Disable a plugin
+    - `get_build_targets()` - Get build targets information
+    - `create_content_folder(folder_path, folder_name)` - Create content browser folders
+    - `get_project_diagnostics()` - Get project diagnostics and validation
+    - `validate_project(check_plugins, check_blueprints, check_assets)` - Validate project integrity
+    
+    ## Configuration Management Tools
+    - `get_config_info()` - Get current configuration information
+    - `load_config_file(config_file)` - Load configuration from a file
+    - `save_config_file(config_data, config_file)` - Save configuration to a file
+    - `create_default_config(config_file)` - Create a default configuration file
+    - `validate_config(config_file)` - Validate configuration file
+    - `reload_config()` - Reload configuration from file
+    - `get_tool_config(tool_name)` - Get configuration for a specific tool
+    - `update_tool_config(tool_name, tool_config_data)` - Update configuration for a specific tool
+    - `check_config_changes()` - Check if configuration file has changed since last load
+    - `list_config_files(config_dir)` - List available configuration files
     
     ## Best Practices
     
@@ -362,6 +536,17 @@ def info():
     - Test functionality in isolation
     - Consider performance implications
     - Document complex setups
+    
+    ### Configuration Management
+    - Use environment-specific configuration files (development.yaml, production.yaml)
+    - Validate configuration files before deployment
+    - Use environment variables for sensitive settings (API keys, passwords)
+    - Keep configuration files in version control with appropriate security
+    - Test configuration changes in development before production
+    - Use configuration validation tools to catch issues early
+    - Document custom configuration settings and their purposes
+    - Use hot-reload for development, disable for production
+    - Monitor configuration changes and log important updates
     
     ### Error Handling
     - Check command responses for success

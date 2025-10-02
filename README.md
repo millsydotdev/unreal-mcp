@@ -29,7 +29,9 @@ The Unreal MCP integration provides comprehensive tools for controlling Unreal E
 |----------|-------------|
 | **Actor Management** | • Create and delete actors (cubes, spheres, lights, cameras, etc.)<br>• Set actor transforms (position, rotation, scale)<br>• Query actor properties and find actors by name<br>• List all actors in the current level |
 | **Blueprint Development** | • Create new Blueprint classes with custom components<br>• Add and configure components (mesh, camera, light, etc.)<br>• Set component properties and physics settings<br>• Compile Blueprints and spawn Blueprint actors<br>• Create input mappings for player controls |
+| **Animation Blueprint Management** | • Create Animation Blueprints with target skeletons<br>• Build Animation State Machines for complex animation logic<br>• Create Blend Spaces for smooth animation blending<br>• Manage Animation Graph nodes and connections<br>• Handle Animation Blueprint variables and properties<br>• Create Animation Montages for special sequences<br>• Compile and validate Animation Blueprints |
 | **Blueprint Node Graph** | • Add event nodes (BeginPlay, Tick, etc.)<br>• Create function call nodes and connect them<br>• Add variables with custom types and default values<br>• Create component and self references<br>• Find and manage nodes in the graph |
+| **Material Management** | • Create materials and material instances<br>• Set material parameters (scalar, vector, texture, static switch)<br>• Assign materials to static meshes<br>• Create material parameter collections<br>• Duplicate materials and manage material properties<br>• Create materials from texture assignments |
 | **Editor Control** | • Focus viewport on specific actors or locations<br>• Control viewport camera orientation and distance |
 
 All these capabilities are accessible through natural language commands via AI assistants, making it easy to automate and control Unreal Engine workflows.
